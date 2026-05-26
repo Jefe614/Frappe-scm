@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "New Activity Type",
+ "creation": "2026-05-13 14:00:00",
+ "description": "Create todo activity types to categorize tasks for your sales team. Examples include Client Visit, Product Demo, Follow Up, Contract Signing, and Site Survey.",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-05-13 14:00:00",
+ "modified_by": "Administrator",
+ "name": "Create Activity Type",
+ "owner": "Administrator",
+ "reference_document": "Todo Activity Type",
+ "show_form_tour": 0,
+ "show_full_form": 0,
+ "title": "Set Up Activity Types",
+ "validate_action": 0
+}

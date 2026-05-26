@@ -1,0 +1,201 @@
+{
+  "charts": [
+    {
+      "chart_name": "Orders Statistic",
+      "label": "Orders Statistic",
+      "col": 12
+
+    }
+  ],
+  "content": "[{\"id\":\"chart001\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Orders Statistic\",\"col\":12}},{\"id\":\"kb3XPLg8lb\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"nWd2KJPW8l\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Route Plans\",\"col\":4}},{\"id\":\"snrzfbFr5Y\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Activity Types\",\"col\":4}},{\"id\":\"NEL1234567\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Todo Activity Feedback\",\"col\":4}},{\"id\":\"NELTERRITORY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Territory\",\"col\":4}},{\"id\":\"NELSALESORDER\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Order\",\"col\":4}},{\"id\":\"VISITSHORTCUT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Visit\",\"col\":4}},{\"id\":\"d_KVM1gsf9\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"RPTSPACER01\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"RPTHEADER01\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports</b></span>\",\"col\":12}},{\"id\":\"RPTCD01\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":12}}]",
+  "creation": "2026-05-13 14:00:00.000000",
+  "docstatus": 0,
+  "doctype": "Workspace",
+  "idx": 0,
+  "is_hidden": 0,
+  "label": "SCM VAP",
+  "links": [
+    {
+      "dependencies": "",
+      "hidden": 0,
+      "icon": "map",
+      "is_query_report": 0,
+      "label": "Route Plan",
+      "link_count": 0,
+      "link_to": "Route Plan",
+      "link_type": "DocType",
+      "onboard": 1,
+      "only_for": "",
+      "type": "Link"
+    },
+    {
+      "dependencies": "",
+      "hidden": 0,
+      "icon": "list",
+      "is_query_report": 0,
+      "label": "Todo Activity Type",
+      "link_count": 0,
+      "link_to": "Todo Activity Type",
+      "link_type": "DocType",
+      "onboard": 1,
+      "only_for": "",
+      "type": "Link"
+    },
+    {
+      "dependencies": "",
+      "hidden": 0,
+      "icon": "comment",
+      "is_query_report": 0,
+      "label": "Todo Activity Feedback",
+      "link_count": 0,
+      "link_to": "Todo Activity Feedback",
+      "link_type": "DocType",
+      "onboard": 1,
+      "only_for": "",
+      "type": "Link"
+    },
+    {
+      "dependencies": "",
+      "hidden": 0,
+      "icon": "map-pin",
+      "is_query_report": 0,
+      "label": "Territory",
+      "link_count": 0,
+      "link_to": "Territory",
+      "link_type": "DocType",
+      "onboard": 0,
+      "only_for": "",
+      "type": "Link"
+    },
+    {
+      "dependencies": "",
+      "hidden": 0,
+      "icon": "shopping-cart",
+      "is_query_report": 0,
+      "label": "Sales Order",
+      "link_count": 0,
+      "link_to": "Sales Order",
+      "link_type": "DocType",
+      "onboard": 0,
+      "only_for": "",
+      "type": "Link"
+    },
+    {
+      "dependencies": "",
+      "hidden": 0,
+      "icon": "map",
+      "is_query_report": 0,
+      "label": "Customer Visit",
+      "link_count": 0,
+      "link_to": "Customer Visit",
+      "link_type": "DocType",
+      "onboard": 1,
+      "only_for": "",
+      "type": "Link"
+    },
+    {
+      "hidden": 0,
+      "is_query_report": 0,
+      "label": "Reports",
+      "link_count": 0,
+      "onboard": 0,
+      "type": "Card Break"
+    },
+    {
+      "dependencies": "",
+      "hidden": 0,
+      "icon": "chart",
+      "is_query_report": 0,
+      "label": "Sales By Rep",
+      "link_count": 0,
+      "link_to": "Sales By Rep",
+      "link_type": "DocType",
+      "onboard": 0,
+      "only_for": "",
+      "type": "Link"
+    }
+  ],
+  "modified": "2026-05-20 11:39:00.000000",
+  "modified_by": "Administrator",
+  "module": "SCM",
+  "name": "SCM VAP",
+  "number_cards": [],
+  "onboarding_list": [
+    {
+      "onboarding": "SCM"
+    }
+  ],
+  "owner": "Administrator",
+  "parent_page": "",
+  "public": 1,
+  "restrict_to_domain": "",
+  "shortcuts": [
+    {
+      "color": "Blue",
+      "doc_view": "",
+      "icon": "map",
+      "label": "Route Plans",
+      "link_to": "Route Plan",
+      "stats_filter": "[]",
+      "type": "DocType",
+      "format": "",
+      "url": ""
+    },
+    {
+      "color": "Green",
+      "doc_view": "",
+      "icon": "list",
+      "label": "Activity Types",
+      "link_to": "Todo Activity Type",
+      "stats_filter": "[]",
+      "type": "DocType",
+      "format": "",
+      "url": ""
+    },
+    {
+      "color": "Yellow",
+      "doc_view": "",
+      "icon": "comment",
+      "label": "Todo Activity Feedback",
+      "link_to": "Todo Activity Feedback",
+      "stats_filter": "[]",
+      "type": "DocType",
+      "format": "",
+      "url": ""
+    },
+    {
+      "color": "Orange",
+      "doc_view": "",
+      "icon": "map-pin",
+      "label": "Territory",
+      "link_to": "Territory",
+      "stats_filter": "[]",
+      "type": "DocType",
+      "format": "",
+      "url": ""
+    },
+    {
+      "color": "Red",
+      "doc_view": "",
+      "icon": "shopping-cart",
+      "label": "Sales Order",
+      "link_to": "Sales Order",
+      "stats_filter": "[]",
+      "type": "DocType",
+      "format": "",
+      "url": ""
+    },
+    {
+      "color": "Purple",
+      "doc_view": "",
+      "icon": "map",
+      "label": "Customer Visit",
+      "link_to": "Customer Visit",
+      "stats_filter": "[]",
+      "type": "DocType",
+      "format": "",
+      "url": ""
+    }
+  ],
+  "title": "SCM VAP"
+}

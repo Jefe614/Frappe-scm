@@ -1,0 +1,61 @@
+/* Customer Visit Map Page Styles */
+
+#customer-visit-map {
+    width: 100%;
+    height: calc(100vh - 100px);
+}
+
+.leaflet-control {
+    font-size: 13px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+.btn-default {
+    background-color: #6c757d;
+}
+
+.btn-default:hover {
+    background-color: #5a6268;
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Leaflet popup styling */
+.leaflet-popup-content {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.leaflet-popup-content a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.leaflet-popup-content a:hover {
+    text-decoration: underline;
+}

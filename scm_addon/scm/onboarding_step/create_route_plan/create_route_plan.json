@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "New Route Plan",
+ "creation": "2026-05-13 14:00:00",
+ "description": "Define a route plan with territories, operating days, and assigned sales representatives. Route Plans form the backbone of your sales operations by organizing coverage areas and schedules.",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-05-13 14:00:00",
+ "modified_by": "Administrator",
+ "name": "Create Route Plan",
+ "owner": "Administrator",
+ "reference_document": "Route Plan",
+ "show_form_tour": 0,
+ "show_full_form": 0,
+ "title": "Create Your First Route Plan",
+ "validate_action": 0
+}

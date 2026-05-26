@@ -1,0 +1,35 @@
+{
+ "allow_roles": [
+  {
+   "role": "All"
+  }
+ ],
+ "creation": "2026-05-13 14:00:00",
+ "docstatus": 0,
+ "doctype": "Module Onboarding",
+ "documentation_url": "https://docs.example.com/scm",
+ "idx": 0,
+ "is_complete": 0,
+ "modified": "2026-05-13 15:46:48.787343",
+ "modified_by": "Administrator",
+ "module": "SCM",
+ "name": "SCM",
+ "owner": "Administrator",
+ "steps": [
+  {
+   "step": "Create Route Plan"
+  },
+  {
+   "step": "Create Activity Type"
+  },
+  {
+   "step": "Assign Territories"
+  },
+  {
+   "step": "Manage Sales Rep Routes"
+  }
+ ],
+ "subtitle": "Get started with Route Planning and Activity Management.",
+ "success_message": "Your SCM setup is complete! You're ready to manage routes, territories, and sales operations.",
+ "title": "Welcome to SCM VAP"
+}

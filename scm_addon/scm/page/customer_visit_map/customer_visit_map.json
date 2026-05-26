@@ -1,0 +1,12 @@
+{
+  "name": "Customer Visit Map",
+  "doctype": "Page",
+  "title": "Customer Visit Map",
+  "module": "scm",
+  "page_length": 0,
+  "public": 0,
+  "icon": "icon-map-marker",
+  "modified": "2026-05-25 17:30:00.000000",
+  "owner": "Administrator",
+  "type": "Standard"
+}

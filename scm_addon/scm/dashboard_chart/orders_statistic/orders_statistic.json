@@ -1,0 +1,13 @@
+{
+  "chart_name": "Orders Statistic",
+  "chart_type": "Count",
+  "document_type": "Sales Order",
+  "based_on": "transaction_date",
+  "timeseries": 1,
+  "time_interval": "Daily",
+  "type": "Bar",
+  "is_public": 1,
+  "filters_json": "[]",
+  "doctype": "Dashboard Chart",
+  "name": "Orders Statistic"
+}

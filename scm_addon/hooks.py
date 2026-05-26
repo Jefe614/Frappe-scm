@@ -11,22 +11,28 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "scm_addon",
-# 		"logo": "/assets/scm_addon/logo.png",
-# 		"title": "SCM-ERPNEXT",
-# 		"route": "/scm_addon",
-# 		"has_permission": "scm_addon.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "scm_addon",
+		"logo": "/assets/scm_addon/logo.png",
+		"title": "SCM-ERPNEXT",
+		"route": "/app/scm"
+	}
+]
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/scm_addon/css/scm_addon.css"
-# app_include_js = "/assets/scm_addon/js/scm_addon.js"
+app_include_css = [
+    "/assets/scm_addon/css/scm_addon.css",
+    "/assets/scm_addon/css/customer_visit_map.css",
+    "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+]
+app_include_js = [
+    "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+    "/assets/scm_addon/js/customer_visit_map.js"
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/scm_addon/css/scm_addon.css"
@@ -39,13 +45,16 @@ app_license = "mit"
 # webform_include_js = {"doctype": "public/js/doctype.js"}
 # webform_include_css = {"doctype": "public/css/doctype.css"}
 
-# include js in page
-# page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
-# doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
+doctype_js = {
+	"Customer Visit": "public/js/customer_visit.js"
+}
+
+doctype_list_js = {
+	"Customer Visit": "public/js/customer_visit_list.js",
+	"Sales By Rep": "public/js/sales_by_rep_list.js"
+}# doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
 # Svg Icons
@@ -83,7 +92,17 @@ app_license = "mit"
 # ------------
 
 # before_install = "scm_addon.install.before_install"
-# after_install = "scm_addon.install.after_install"
+after_install = "scm_addon.install.after_install"
+after_migrate = "scm_addon.install.after_migrate"
+fixtures = [
+    {"dt": "Dashboard Chart", "filters": [["module", "=", "SCM"]]},
+    {"dt": "Workspace", "filters": [["module", "=", "SCM"]]},
+    {"dt": "Module Onboarding", "filters": [["module", "=", "SCM"]]},
+    {"dt": "Onboarding Step", "filters": [["name", "in", [
+        "Create Route Plan", "Create Activity Type",
+        "Assign Territories", "Manage Sales Rep Routes"
+    ]]]},
+]
 
 # Uninstallation
 # ------------
@@ -137,34 +156,27 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    "Customer Visit": {
+        "on_submit": "scm_addon.scm.doctype.customer_visit.customer_visit.update_sales_by_rep",
+        "on_cancel": "scm_addon.scm.doctype.customer_visit.customer_visit.update_sales_by_rep"
+    },
+    "Sales Order": {
+        "before_validate": "scm_addon.scm.doctype.customer_visit.customer_visit.set_sales_order_defaults"
+    }
+}
 
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"scm_addon.tasks.all"
-# 	],
-# 	"daily": [
-# 		"scm_addon.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"scm_addon.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"scm_addon.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"scm_addon.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"all": [
+		"scm_addon.scm.doctype.customer_visit.customer_visit.refresh_all_sales_by_rep"
+	],
+	"daily": [
+		"scm_addon.scm.doctype.customer_visit.customer_visit.refresh_all_sales_by_rep"
+	],
+}
 
 # Testing
 # -------

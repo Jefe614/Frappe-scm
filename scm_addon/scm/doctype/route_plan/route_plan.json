@@ -1,0 +1,146 @@
+{
+ "actions": [],
+ "creation": "2026-04-29 15:45:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "route_info_sb",
+  "route_plan_name",
+  "end_date",
+  "cb1",
+  "start_date",
+  "route",
+  "select_days_sb",
+  "select_days",
+  "cb3",
+  "status",
+  "salesmen_sb",
+  "salesmen"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "RP-.####",
+   "reqd": 1
+  },
+  {
+   "fieldname": "route_info_sb",
+   "fieldtype": "Section Break",
+   "label": "Route Plan Information"
+  },
+  {
+   "fieldname": "route_plan_name",
+   "fieldtype": "Data",
+   "label": "Route Plan Name",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "cb1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Table MultiSelect",
+   "label": "Route",
+   "options": "Route Plan Territory",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "select_days_sb",
+   "fieldtype": "Section Break",
+   "label": "Days"
+  },
+  {
+   "fieldname": "select_days",
+   "fieldtype": "Table MultiSelect",
+   "label": "Days",
+   "options": "Route Plan Days"
+  },
+  {
+   "fieldname": "cb3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Check",
+   "label": "Status",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "salesmen_sb",
+   "fieldtype": "Section Break",
+   "label": "Salesmen"
+  },
+  {
+   "fieldname": "salesmen",
+   "fieldtype": "Table",
+   "label": "Salesmen",
+   "options": "Route Plan Sales Reps"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-25 13:18:00.000000",
+ "modified_by": "Administrator",
+ "module": "scm",
+ "name": "Route Plan",
+ "naming_rule": "By \"Naming Series\"",
+ "autoname": "naming_series:",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sales Master Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sales User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "states": []
+}

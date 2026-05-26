@@ -1,0 +1,78 @@
+[
+ {
+  "allow_roles": [
+   {
+    "parent": "SCM",
+    "parentfield": "allow_roles",
+    "parenttype": "Module Onboarding",
+    "role": "All"
+   },
+   {
+    "parent": "SCM",
+    "parentfield": "allow_roles",
+    "parenttype": "Module Onboarding",
+    "role": "All"
+   }
+  ],
+  "docstatus": 0,
+  "doctype": "Module Onboarding",
+  "documentation_url": "https://docs.example.com/scm",
+  "is_complete": 0,
+  "modified": "2026-05-13 15:46:48.787343",
+  "module": "SCM",
+  "name": "SCM",
+  "steps": [
+   {
+    "parent": "SCM",
+    "parentfield": "steps",
+    "parenttype": "Module Onboarding",
+    "step": "Create Route Plan"
+   },
+   {
+    "parent": "SCM",
+    "parentfield": "steps",
+    "parenttype": "Module Onboarding",
+    "step": "Create Route Plan"
+   },
+   {
+    "parent": "SCM",
+    "parentfield": "steps",
+    "parenttype": "Module Onboarding",
+    "step": "Create Activity Type"
+   },
+   {
+    "parent": "SCM",
+    "parentfield": "steps",
+    "parenttype": "Module Onboarding",
+    "step": "Create Activity Type"
+   },
+   {
+    "parent": "SCM",
+    "parentfield": "steps",
+    "parenttype": "Module Onboarding",
+    "step": "Assign Territories"
+   },
+   {
+    "parent": "SCM",
+    "parentfield": "steps",
+    "parenttype": "Module Onboarding",
+    "step": "Assign Territories"
+   },
+   {
+    "parent": "SCM",
+    "parentfield": "steps",
+    "parenttype": "Module Onboarding",
+    "step": "Manage Sales Rep Routes"
+   },
+   {
+    "parent": "SCM",
+    "parentfield": "steps",
+    "parenttype": "Module Onboarding",
+    "step": "Manage Sales Rep Routes"
+   }
+  ],
+  "subtitle": "Get started with Route Planning and Activity Management.",
+  "success_message": "Your SCM setup is complete! You're ready to manage routes, territories, and sales operations.",
+  "title": "Welcome to SCM VAP"
+ }
+]

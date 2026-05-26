@@ -1,0 +1,111 @@
+{
+ "actions": [],
+ "allow_import": 0,
+ "autoname": "format:SALES-REP-{#####}",
+ "creation": "2026-05-24 11:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sales_person",
+  "sales_target",
+  "qty_target",
+  "sales",
+  "qty_sold",
+  "customers_in_route",
+  "visits"
+ ],
+ "fields": [
+  {
+   "fieldname": "sales_person",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Sales Person",
+   "options": "Sales Person",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sales_target",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Sales Target"
+  },
+  {
+   "fieldname": "qty_target",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qty Target"
+  },
+  {
+   "fieldname": "sales",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Sales",
+   "read_only": 1
+  },
+  {
+   "fieldname": "qty_sold",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qty Sold",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customers_in_route",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Customers in Route",
+   "read_only": 1
+  },
+  {
+   "fieldname": "visits",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Visits",
+   "read_only": 1
+  }
+ ],
+  "hide_name": 1,
+  "title_field": "sales_person",
+  "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-24 11:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "scm",
+ "name": "Sales By Rep",
+ "naming_rule": "By \"Naming Series\"",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sales Master Manager",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sales User",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}

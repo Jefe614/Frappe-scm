@@ -1,1 +1,1 @@
-SCM-ERPNEXT
+scm
