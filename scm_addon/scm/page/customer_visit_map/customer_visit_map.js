@@ -5,312 +5,519 @@ frappe.pages['customer-visit-map'].on_page_load = function(wrapper) {
         single_column: true
     });
 
-    page.main.innerHTML = '<div id="customer-visit-map" style="width: 100%; height: calc(100vh - 100px);"></div>';
+    var styles = `
+        <style>
+            .map-page-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 15px;
+                background: white;
+                border-bottom: 1px solid #e0e0e0;
+                flex-wrap: wrap;
+            }
+            .date-range-group {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .date-range-group input[type="date"] {
+                padding: 6px 10px;
+                border: 1px solid #d0d0d0;
+                border-radius: 4px;
+                font-size: 13px;
+                color: #333;
+                cursor: pointer;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+            .date-range-group input[type="date"]:focus {
+                border-color: #2196F3;
+            }
+            .date-range-sep { color: #999; font-size: 13px; }
+            .view-toggle-group {
+                display: flex;
+                border: 1px solid #d0d0d0;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            .view-toggle-btn {
+                padding: 6px 14px;
+                background: white;
+                border: none;
+                font-size: 13px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                color: #555;
+                transition: background 0.2s, color 0.2s;
+            }
+            .view-toggle-btn.active { background: #2196F3; color: white; }
+            .view-toggle-btn:not(:last-child) { border-right: 1px solid #d0d0d0; }
+            .header-filter-select {
+                padding: 6px 10px;
+                border: 1px solid #d0d0d0;
+                border-radius: 4px;
+                font-size: 13px;
+                color: #333;
+                min-width: 180px;
+                outline: none;
+                cursor: pointer;
+            }
+            .map-wrapper {
+                position: relative;
+                height: calc(100vh - 145px);
+                width: 100%;
+            }
+            #customer-visit-map { width: 100%; height: 100%; }
 
-    // Load Leaflet if not already loaded
-    if (typeof L === 'undefined') {
-        frappe.require([
-            'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-            'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
-        ], function() {
-            initCustomerVisitMap();
-        });
-    } else {
-        initCustomerVisitMap();
+            /* Sidebar — pushed below zoom controls (~80px from top) */
+            #map-sidebar {
+                position: absolute;
+                top: 80px;
+                left: 10px;
+                width: 220px;
+                background: white;
+                border-radius: 6px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                z-index: 1000;
+                max-height: calc(100vh - 260px);
+                overflow-y: auto;
+            }
+            #sidebar-header {
+                padding: 10px 14px;
+                font-weight: 600;
+                font-size: 13px;
+                color: #333;
+                border-bottom: 1px solid #eee;
+            }
+            #salesmen-list { padding: 8px 10px; }
+            .salesman-item {
+                padding: 8px 10px;
+                margin-bottom: 5px;
+                border-radius: 4px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 13px;
+                transition: background 0.2s;
+                user-select: none;
+            }
+            .salesman-item:hover { background: #f5f5f5; }
+            .salesman-item.inactive { opacity: 0.4; }
+            .color-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+            .salesman-name { flex: 1; font-weight: 500; font-size: 12px; line-height: 1.3; }
+            .visit-count {
+                font-size: 11px; color: #888;
+                background: #eee; padding: 1px 6px; border-radius: 8px;
+            }
+            .no-data { text-align: center; padding: 15px; color: #aaa; font-size: 12px; }
+            .routing-status {
+                position: absolute;
+                bottom: 30px; right: 10px;
+                background: white;
+                padding: 6px 12px;
+                border-radius: 4px;
+                font-size: 11px; color: #555;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+                z-index: 1000;
+                display: none;
+            }
+        </style>
+    `;
+    $(page.body).append(styles);
+
+    // ── Header toolbar ─────────────────────────────────────────────────────────
+    var header = $(`
+        <div class="map-page-header">
+            <div class="date-range-group">
+                <input type="date" id="date-from" />
+                <span class="date-range-sep">→</span>
+                <input type="date" id="date-to" />
+            </div>
+            <div class="view-toggle-group">
+                <button class="view-toggle-btn active" id="btn-map-view">📍 Map View</button>
+                <button class="view-toggle-btn" id="btn-table-view">📋 Table View</button>
+            </div>
+            <select class="header-filter-select" id="sales-rep-filter">
+                <option value="">Filter by sales rep</option>
+            </select>
+        </div>
+    `);
+    $(page.main).append(header);
+
+    // ── Map wrapper ────────────────────────────────────────────────────────────
+    var mapWrapper = $(`
+        <div class="map-wrapper">
+            <div id="map-sidebar">
+                <div id="sidebar-header">Salesmen</div>
+                <div id="salesmen-list"><div class="no-data">Loading...</div></div>
+            </div>
+            <div id="customer-visit-map"></div>
+            <div class="routing-status" id="routing-status">Computing road routes...</div>
+        </div>
+    `);
+    $(page.main).append(mapWrapper);
+
+    // ── Default dates (today) ──────────────────────────────────────────────────
+    const today = new Date().toISOString().split('T')[0];
+    $('#date-from').val(today);
+    $('#date-to').val(today);
+
+    // ── Auto-apply on any filter change ───────────────────────────────────────
+    function triggerReload() {
+        const df = $('#date-from').val();
+        const dt = $('#date-to').val();
+        if (df && dt && df > dt) {
+            frappe.msgprint({ title: 'Error', message: 'From date cannot be after To date', indicator: 'red' });
+            return;
+        }
+        if (window._visitMapInstance) window._visitMapInstance.reload();
     }
+
+    $('#date-from').on('change', triggerReload);
+    $('#date-to').on('change', triggerReload);
+    $('#sales-rep-filter').on('change', function() {
+        if (window._visitMapInstance) window._visitMapInstance.filterBySalesRep($(this).val());
+    });
+
+    // ── Table view → navigate to list ─────────────────────────────────────────
+    $('#btn-table-view').on('click', function() {
+        frappe.set_route('List', 'Customer Visit');
+    });
+
+    $('#btn-map-view').on('click', function() {
+        // already here, just ensure active state
+        $(this).addClass('active');
+        $('#btn-table-view').removeClass('active');
+    });
+
+    // ── Init map ───────────────────────────────────────────────────────────────
+    setTimeout(function() {
+        if (typeof L === 'undefined') { console.error('Leaflet not loaded'); return; }
+        window._visitMapInstance = initCustomerVisitMap();
+    }, 100);
 };
+
 
 function initCustomerVisitMap() {
     'use strict';
 
     let map = null;
     let markers = [];
+    let routeLayers = [];
+    let allVisits = [];
+    let salesmenData = {};
+    let isMapInitialized = false;
 
-    // Initialize map when page is ready
+    const colorPalette = [
+        '#E91E63','#F44336','#2196F3','#4CAF50',
+        '#FF9800','#9C27B0','#00BCD4','#FF5722',
+        '#3F51B5','#009688','#8BC34A','#FFC107'
+    ];
+
+    // ── Init map ───────────────────────────────────────────────────────────────
     function initMap() {
-        const mapElement = document.getElementById('customer-visit-map');
-        if (!mapElement) {
-            console.error('Map container not found');
+        if (isMapInitialized) return;
+        const el = document.getElementById('customer-visit-map');
+        if (!el) return;
+
+        map = L.map('customer-visit-map').setView([-0.0236, 37.9062], 7);
+        isMapInitialized = true;
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19, minZoom: 2
+        }).addTo(map);
+
+        // Map / Satellite toggle (top-right, won't conflict with zoom which is top-left)
+        const SatControl = L.Control.extend({
+            options: { position: 'topright' },
+            onAdd: function() {
+                const div = L.DomUtil.create('div');
+                div.innerHTML = `
+                    <div style="background:white;border-radius:4px;box-shadow:0 1px 5px rgba(0,0,0,.3);
+                                overflow:hidden;display:flex;margin-bottom:5px;">
+                        <button id="lf-map-btn" style="padding:5px 12px;border:none;font-size:12px;
+                            cursor:pointer;background:#2196F3;color:white;font-weight:600;">Map</button>
+                        <button id="lf-sat-btn" style="padding:5px 12px;border:none;font-size:12px;
+                            cursor:pointer;background:white;color:#555;">Satellite</button>
+                    </div>`;
+                return div;
+            }
+        });
+        new SatControl().addTo(map);
+
+        let satLayer = null;
+        $(document).on('click', '#lf-sat-btn', function() {
+            if (!satLayer) {
+                satLayer = L.tileLayer(
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                    { attribution: 'Tiles © Esri', maxZoom: 19 }
+                ).addTo(map);
+            }
+            satLayer.addTo(map);
+            $('#lf-sat-btn').css({ background: '#2196F3', color: 'white', fontWeight: '600' });
+            $('#lf-map-btn').css({ background: 'white', color: '#555', fontWeight: 'normal' });
+        });
+        $(document).on('click', '#lf-map-btn', function() {
+            if (satLayer) map.removeLayer(satLayer);
+            $('#lf-map-btn').css({ background: '#2196F3', color: 'white', fontWeight: '600' });
+            $('#lf-sat-btn').css({ background: 'white', color: '#555', fontWeight: 'normal' });
+        });
+
+        window.addEventListener('resize', () => map && setTimeout(() => map.invalidateSize(), 100));
+        loadVisitData();
+    }
+
+    // ── Load visits ────────────────────────────────────────────────────────────
+    function loadVisitData() {
+        const dateFrom = $('#date-from').val();
+        const dateTo   = $('#date-to').val();
+
+        let filters = [['docstatus', '!=', 2]];
+        if (dateFrom) filters.push(['date', '>=', dateFrom]);
+        if (dateTo)   filters.push(['date', '<=', dateTo]);
+
+        const activeSalesRep = $('#sales-rep-filter').val();
+        if (activeSalesRep) filters.push(['sales_person', '=', activeSalesRep]);
+
+        frappe.call({
+            method: 'frappe.client.get_list',
+            args: {
+                doctype: 'Customer Visit',
+                filters: filters,
+                fields: ['name', 'customer', 'date', 'sales_person', 'duration'],
+                limit_page_length: 1000,
+                order_by: 'sales_person asc, date asc'
+            },
+            callback: function(r) {
+                if (r.message && r.message.length > 0) {
+                    allVisits = r.message;
+                    loadCustomerLocations();
+                } else {
+                    allVisits = [];
+                    clearMap();
+                    $('#salesmen-list').html('<div class="no-data">No visits found</div>');
+                }
+            }
+        });
+    }
+
+    // ── Load customer lat/lng ──────────────────────────────────────────────────
+    function loadCustomerLocations() {
+        const customerNames = [...new Set(allVisits.map(v => v.customer))];
+
+        frappe.call({
+            method: 'frappe.client.get_list',
+            args: {
+                doctype: 'Customer',
+                filters: [['name', 'in', customerNames]],
+                fields: ['name', 'custom_latitude', 'custom_longitude'],
+                limit_page_length: 1000
+            },
+            callback: function(r) {
+                const locs = {};
+                (r.message || []).forEach(c => {
+                    locs[c.name] = {
+                        lat: parseFloat(c.custom_latitude) || null,
+                        lng: parseFloat(c.custom_longitude) || null
+                    };
+                });
+                processVisits(locs);
+                populateSalesRepFilter();
+                renderSalesmenList();
+                renderVisits();
+            }
+        });
+    }
+
+    // ── Process visits ─────────────────────────────────────────────────────────
+    function processVisits(locs) {
+        salesmenData = {};
+        let ci = 0;
+
+        allVisits.forEach(v => {
+            const sm = v.sales_person || 'Unassigned';
+            if (!salesmenData[sm]) {
+                salesmenData[sm] = {
+                    name: sm,
+                    visits: [],
+                    color: colorPalette[ci++ % colorPalette.length],
+                    visible: true
+                };
+            }
+            const loc = locs[v.customer];
+            if (loc && loc.lat && loc.lng) {
+                salesmenData[sm].visits.push({ ...v, lat: loc.lat, lng: loc.lng });
+            }
+        });
+    }
+
+    // ── Populate sales rep dropdown (preserve selection) ───────────────────────
+    function populateSalesRepFilter() {
+        const sel = $('#sales-rep-filter');
+        const current = sel.val();
+        sel.find('option:not(:first)').remove();
+        Object.keys(salesmenData).sort().forEach(name => {
+            sel.append(`<option value="${frappe.utils.escape_html(name)}">${frappe.utils.escape_html(name)}</option>`);
+        });
+        if (current) sel.val(current);
+    }
+
+    // ── Sidebar ────────────────────────────────────────────────────────────────
+    function renderSalesmenList() {
+        const list = $('#salesmen-list').empty();
+        const names = Object.keys(salesmenData).sort().filter(n => salesmenData[n].visits.length > 0);
+
+        if (!names.length) {
+            list.html('<div class="no-data">No data</div>');
             return;
         }
 
-        // Create map centered on Kenya
-        map = L.map('customer-visit-map').setView([0.3031, 37.7669], 6);
-
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 19,
-            minZoom: 2
-        }).addTo(map);
-
-        // Load customer visit data
-        loadCustomerVisits();
-
-        // Add controls
-        addControls();
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (map) {
-                setTimeout(() => map.invalidateSize(), 100);
-            }
+        names.forEach(name => {
+            const sm = salesmenData[name];
+            const item = $(`
+                <div class="salesman-item ${sm.visible ? '' : 'inactive'}" data-sm="${frappe.utils.escape_html(name)}">
+                    <div class="color-dot" style="background:${sm.color};"></div>
+                    <div class="salesman-name">${frappe.utils.escape_html(name)}</div>
+                    <div class="visit-count">${sm.visits.length}</div>
+                </div>
+            `);
+            item.on('click', function() {
+                sm.visible = !sm.visible;
+                $(this).toggleClass('inactive', !sm.visible);
+                renderVisits();
+            });
+            list.append(item);
         });
     }
 
-    // Load customer visits from Frappe backend
-    function loadCustomerVisits() {
-        frappe.call({
-            method: 'frappe.client.get_list',
-            args: {
-                doctype: 'Customer Visit',
-                filters: {
-                    'docstatus': 1  // Only submitted documents
-                },
-                fields: ['name', 'customer', 'date', 'start_latitude', 'start_longitude', 'stop_latitude', 'stop_longitude', 'sales_person', 'duration'],
-                limit_page_length: 500
-            },
-            callback: function(r) {
-                if (r.message) {
-                    renderMarkers(r.message);
-                    addStatistics(r.message);
-                }
-            },
-            error: function(err) {
-                console.error('Error loading customer visits:', err);
-                frappe.msgprint({
-                    title: 'Error',
-                    message: 'Failed to load customer visits',
-                    indicator: 'red'
-                });
-            }
-        });
-    }
-
-    // Render markers on map
-    function renderMarkers(visits) {
-        clearMarkers();
-
-        visits.forEach(function(visit) {
-            if (visit.start_latitude && visit.start_longitude) {
-                // Create start location marker
-                const startMarker = L.marker(
-                    [visit.start_latitude, visit.start_longitude],
-                    {
-                        icon: L.icon({
-                            iconUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%234CAF50" stroke="white" stroke-width="2"/></svg>',
-                            iconSize: [32, 32],
-                            iconAnchor: [16, 32],
-                            popupAnchor: [0, -32]
-                        })
-                    }
-                );
-
-                const popupContent = `
-                    <div style="min-width: 250px; font-size: 12px;">
-                        <strong style="color: #333;">${frappe.utils.escape_html(visit.customer)}</strong><br>
-                        <small>Visit ID: ${frappe.utils.escape_html(visit.name)}</small><br>
-                        <small>Date: ${frappe.format(visit.date, {fieldtype: 'Date'})}</small><br>
-                        <small>Sales Person: ${visit.sales_person ? frappe.utils.escape_html(visit.sales_person) : 'N/A'}</small><br>
-                        <small>Duration: ${visit.duration || 'N/A'}</small>
-                        <hr style="margin: 8px 0;">
-                        <small><strong>Start Location:</strong><br>${visit.start_latitude.toFixed(4)}, ${visit.start_longitude.toFixed(4)}</small>
-                        ${visit.stop_latitude && visit.stop_longitude ? `<br><small><strong>Stop Location:</strong><br>${visit.stop_latitude.toFixed(4)}, ${visit.stop_longitude.toFixed(4)}</small>` : ''}
-                        <hr style="margin: 8px 0;">
-                        <a class="btn btn-sm btn-primary" href="/app/customer-visit/${frappe.utils.escape_html(visit.name)}" target="_blank" style="display: inline-block;">View Details</a>
-                    </div>
-                `;
-
-                startMarker.bindPopup(popupContent);
-                startMarker.addTo(map);
-                markers.push(startMarker);
-
-                // Add stop location marker if exists
-                if (visit.stop_latitude && visit.stop_longitude) {
-                    const stopMarker = L.marker(
-                        [visit.stop_latitude, visit.stop_longitude],
-                        {
-                            icon: L.icon({
-                                iconUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%232196F3" stroke="white" stroke-width="2"/></svg>',
-                                iconSize: [32, 32],
-                                iconAnchor: [16, 32],
-                                popupAnchor: [0, -32]
-                            })
-                        }
-                    );
-
-                    const stopPopupContent = `
-                        <div style="min-width: 250px; font-size: 12px;">
-                            <strong>${frappe.utils.escape_html(visit.customer)} (Stop)</strong><br>
-                            <small>Visit ID: ${frappe.utils.escape_html(visit.name)}</small><br>
-                            <small>Stop Location:</small><br>
-                            <small>${visit.stop_latitude.toFixed(4)}, ${visit.stop_longitude.toFixed(4)}</small>
-                            <hr style="margin: 8px 0;">
-                            <a class="btn btn-sm btn-primary" href="/app/customer-visit/${frappe.utils.escape_html(visit.name)}" target="_blank" style="display: inline-block;">View Details</a>
-                        </div>
-                    `;
-
-                    stopMarker.bindPopup(stopPopupContent);
-                    stopMarker.addTo(map);
-                    markers.push(stopMarker);
-
-                    // Draw line between start and stop
-                    const line = L.polyline(
-                        [[visit.start_latitude, visit.start_longitude], [visit.stop_latitude, visit.stop_longitude]],
-                        {
-                            color: '#666',
-                            weight: 2,
-                            opacity: 0.5,
-                            dashArray: '5, 5'
-                        }
-                    );
-                    line.addTo(map);
-                }
-            }
-        });
-
-        // Auto-fit map bounds
-        if (markers.length > 0) {
-            const group = new L.featureGroup(markers);
-            map.fitBounds(group.getBounds(), { padding: [50, 50] });
+    // ── OSRM road routing ──────────────────────────────────────────────────────
+    async function getRoadRoute(coords) {
+        if (coords.length < 2) return null;
+        const waypoints = coords.map(c => `${c[1]},${c[0]}`).join(';');
+        const url = `https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson`;
+        try {
+            const resp = await fetch(url);
+            if (!resp.ok) return null;
+            const data = await resp.json();
+            if (data.code !== 'Ok' || !data.routes || !data.routes[0]) return null;
+            return data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        } catch (e) {
+            console.warn('OSRM routing failed, falling back to straight line:', e);
+            return null;
         }
     }
 
-    // Clear all markers from map
-    function clearMarkers() {
-        markers.forEach(function(marker) {
-            map.removeLayer(marker);
-        });
-        markers = [];
-    }
+    // ── Render visits + road routes ────────────────────────────────────────────
+    async function renderVisits() {
+        clearMap();
 
-    // Add map controls
-    function addControls() {
-        // Add refresh button
-        const refreshControl = L.Control.extend({
-            options: {
-                position: 'topright'
-            },
-            onAdd: function(map) {
-                const btn = L.DomUtil.create('button', 'btn btn-sm btn-default');
-                btn.innerHTML = '<i class="fa fa-refresh"></i> Refresh';
-                btn.title = 'Refresh map data';
-                btn.style.padding = '8px 12px';
-                btn.style.backgroundColor = 'white';
-                btn.style.border = '2px solid #ccc';
-                btn.style.borderRadius = '4px';
-                btn.style.cursor = 'pointer';
-                btn.style.marginBottom = '10px';
-                btn.style.zIndex = '1000';
+        const activeSalesRep = $('#sales-rep-filter').val();
+        const names = Object.keys(salesmenData).sort();
 
-                btn.onclick = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    loadCustomerVisits();
-                };
+        const activeRoutes = names.filter(n =>
+            salesmenData[n].visible &&
+            salesmenData[n].visits.length > 1 &&
+            (!activeSalesRep || n === activeSalesRep)
+        ).length;
 
-                return btn;
-            }
-        });
+        if (activeRoutes > 0) {
+            $('#routing-status').text(`Computing road routes (0/${activeRoutes})...`).show();
+        }
 
-        new refreshControl().addTo(map);
+        let routed = 0;
 
-        // Add filter control
-        const filterControl = L.Control.extend({
-            options: {
-                position: 'topleft'
-            },
-            onAdd: function(map) {
-                const div = L.DomUtil.create('div', 'leaflet-control');
-                div.style.backgroundColor = 'white';
-                div.style.padding = '10px';
-                div.style.borderRadius = '4px';
-                div.style.border = '2px solid #ccc';
-                div.style.zIndex = '1000';
+        for (const name of names) {
+            const sm = salesmenData[name];
+            if (!sm.visible) continue;
+            if (activeSalesRep && name !== activeSalesRep) continue;
+            if (sm.visits.length === 0) continue;
 
-                const title = L.DomUtil.create('h6', '', div);
-                title.innerHTML = 'Filter';
-                title.style.margin = '0 0 10px 0';
-                title.style.fontSize = '14px';
-                title.style.fontWeight = 'bold';
+            const visits = [...sm.visits].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const coords  = visits.map(v => [v.lat, v.lng]);
 
-                const input = L.DomUtil.create('input', '', div);
-                input.type = 'text';
-                input.placeholder = 'Search by customer...';
-                input.style.width = '200px';
-                input.style.padding = '5px';
-                input.style.marginBottom = '8px';
-                input.style.border = '1px solid #ddd';
-                input.style.borderRadius = '3px';
-                input.style.boxSizing = 'border-box';
-
-                input.onchange = function() {
-                    filterMarkers(input.value);
-                };
-
-                return div;
-            }
-        });
-
-        new filterControl().addTo(map);
-    }
-
-    // Filter markers based on search
-    function filterMarkers(searchText) {
-        frappe.call({
-            method: 'frappe.client.get_list',
-            args: {
-                doctype: 'Customer Visit',
-                filters: [
-                    ['Customer Visit', 'docstatus', '=', 1],
-                    ['Customer Visit', 'customer', 'like', '%' + searchText + '%']
-                ],
-                fields: ['name', 'customer', 'date', 'start_latitude', 'start_longitude', 'stop_latitude', 'stop_longitude', 'sales_person', 'duration'],
-                limit_page_length: 500
-            },
-            callback: function(r) {
-                if (r.message) {
-                    renderMarkers(r.message);
+            // Road route
+            if (visits.length > 1) {
+                let routePoints = [];
+                const chunkSize = 25;
+                for (let i = 0; i < coords.length; i += chunkSize - 1) {
+                    const chunk = coords.slice(i, i + chunkSize);
+                    if (chunk.length < 2) break;
+                    const road = await getRoadRoute(chunk);
+                    routePoints = routePoints.concat(road || chunk);
                 }
+                if (routePoints.length > 1) {
+                    const polyline = L.polyline(routePoints, {
+                        color: sm.color, weight: 4, opacity: 0.85
+                    }).addTo(map);
+                    routeLayers.push(polyline);
+                }
+                routed++;
+                $('#routing-status').text(`Computing road routes (${routed}/${activeRoutes})...`);
             }
-        });
+
+            // Markers
+            visits.forEach((visit, idx) => {
+                const icon = L.divIcon({
+                    className: '',
+                    html: `<div style="
+                        background:${sm.color};color:white;border-radius:50%;
+                        width:30px;height:30px;display:flex;align-items:center;
+                        justify-content:center;font-weight:700;font-size:13px;
+                        border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35);
+                    ">${idx + 1}</div>`,
+                    iconSize: [30, 30], iconAnchor: [15, 15], popupAnchor: [0, -15]
+                });
+
+                const marker = L.marker([visit.lat, visit.lng], { icon });
+                marker.bindPopup(`
+                    <div style="min-width:220px;font-size:12px;">
+                        <div style="font-size:14px;font-weight:600;margin-bottom:4px;">
+                            Sales Rep: ${frappe.utils.escape_html(visit.sales_person || 'Unassigned')}
+                        </div>
+                        <div style="color:#555;">Customer: ${frappe.utils.escape_html(visit.customer)}</div>
+                        <hr style="margin:6px 0;">
+                        <div><strong>Date:</strong> ${frappe.format(visit.date, {fieldtype:'Date'})}</div>
+                        <div><strong>Duration:</strong> ${visit.duration || 'N/A'}</div>
+                        <hr style="margin:6px 0;">
+                        <a class="btn btn-xs btn-primary"
+                           onclick="frappe.set_route('Form','Customer Visit','${frappe.utils.escape_html(visit.name)}');return false;"
+                           href="#">View Details</a>
+                    </div>
+                `);
+                marker.addTo(map);
+                markers.push(marker);
+            });
+        }
+
+        $('#routing-status').fadeOut(1000);
+
+        if (markers.length > 0) {
+            map.fitBounds(new L.featureGroup(markers).getBounds(), { padding: [50, 50] });
+        }
     }
 
-    // Add statistics panel
-    function addStatistics(visits) {
-        const stats = {
-            total_visits: visits.length,
-            unique_customers: new Set(visits.map(v => v.customer)).size,
-            unique_sales_people: new Set(visits.filter(v => v.sales_person).map(v => v.sales_person)).size
-        };
-
-        const statsControl = L.Control.extend({
-            options: {
-                position: 'bottomleft'
-            },
-            onAdd: function(map) {
-                const div = L.DomUtil.create('div', 'leaflet-control');
-                div.style.backgroundColor = 'white';
-                div.style.padding = '10px';
-                div.style.borderRadius = '4px';
-                div.style.border = '2px solid #ccc';
-                div.style.fontSize = '12px';
-                div.style.zIndex = '1000';
-
-                div.innerHTML = `
-                    <strong>Customer Visits Statistics</strong><br>
-                    <small>Total Visits: <strong>${stats.total_visits}</strong></small><br>
-                    <small>Unique Customers: <strong>${stats.unique_customers}</strong></small><br>
-                    <small>Sales People: <strong>${stats.unique_sales_people}</strong></small>
-                `;
-
-                return div;
-            }
-        });
-
-        new statsControl().addTo(map);
+    // ── Public API ─────────────────────────────────────────────────────────────
+    function filterBySalesRep(name) {
+        renderVisits();
     }
 
-    // Start initialization
+    function reload() {
+        clearMap();
+        $('#salesmen-list').html('<div class="no-data">Loading...</div>');
+        loadVisitData();
+    }
+
+    function clearMap() {
+        [...markers, ...routeLayers].forEach(l => { try { map.removeLayer(l); } catch(e){} });
+        markers = [];
+        routeLayers = [];
+    }
+
     initMap();
+    return { reload, filterBySalesRep };
 }

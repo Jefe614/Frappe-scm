@@ -1,7 +1,8 @@
 {
  "actions": [],
  "allow_import": 0,
- "autoname": "format:SALES-REP-{#####}",
+ "allow_rename": 0,
+ "autoname": "hash",
  "creation": "2026-05-24 11:00:00.000000",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -11,8 +12,8 @@
   "qty_target",
   "sales",
   "qty_sold",
-  "customers_in_route",
-  "visits"
+  "visits",
+  "customers_in_route"
  ],
  "fields": [
   {
@@ -22,85 +23,105 @@
    "in_standard_filter": 1,
    "label": "Sales Person",
    "options": "Sales Person",
-   "reqd": 1
+   "reqd": 1,
+   "columns": 2
   },
   {
    "fieldname": "sales_target",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Sales Target"
-  },
-  {
-   "fieldname": "qty_target",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Qty Target"
+   "label": "Sales Target",
+   "default": "0",
+   "columns": 2
   },
   {
    "fieldname": "sales",
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Sales",
-   "read_only": 1
+   "read_only": 1,
+   "default": "0",
+   "columns": 2
+  },
+  {
+   "fieldname": "qty_target",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qty Target",
+   "default": "0",
+   "columns": 1
   },
   {
    "fieldname": "qty_sold",
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Qty Sold",
-   "read_only": 1
-  },
-  {
-   "fieldname": "customers_in_route",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "Customers in Route",
-   "read_only": 1
+   "read_only": 1,
+   "default": "0",
+   "columns": 1
   },
   {
    "fieldname": "visits",
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Visits",
-   "read_only": 1
+   "read_only": 1,
+   "default": "0",
+   "columns": 1
+  },
+  {
+   "fieldname": "customers_in_route",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Customers",
+   "read_only": 1,
+   "default": "0",
+   "columns": 1
   }
  ],
-  "hide_name": 1,
-  "title_field": "sales_person",
-  "index_web_pages_for_search": 1,
+ "hide_name_column": 1,
+ "title_field": "sales_person",
+ "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-05-24 11:00:00.000000",
+ "default_view": "Report",
+ "modified": "2026-05-26 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "scm",
  "name": "Sales By Rep",
- "naming_rule": "By \"Naming Series\"",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
    "email": 1,
    "export": 1,
+   "permlevel": 0,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "select": 1,
    "share": 1
   },
   {
    "email": 1,
    "export": 1,
+   "permlevel": 0,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "Sales Master Manager",
+   "select": 1,
    "share": 1
   },
   {
    "email": 1,
    "export": 1,
+   "permlevel": 0,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "Sales User",
+   "select": 1,
    "share": 1
   }
  ],

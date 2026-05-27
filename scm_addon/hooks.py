@@ -25,13 +25,11 @@ add_to_apps_screen = [
 
 # include js, css files in header of desk.html
 app_include_css = [
-    "/assets/scm_addon/css/scm_addon.css",
     "/assets/scm_addon/css/customer_visit_map.css",
     "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 ]
 app_include_js = [
-    "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
-    "/assets/scm_addon/js/customer_visit_map.js"
+    "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
 ]
 
 # include js, css files in header of web template
@@ -48,13 +46,14 @@ app_include_js = [
 
 # include js in doctype views
 doctype_js = {
-	"Customer Visit": "public/js/customer_visit.js"
+	"Customer Visit": "public/js/customer_visit.js",
+	"Sales By Rep": "public/js/sales_by_rep.js"
 }
 
 doctype_list_js = {
-	"Customer Visit": "public/js/customer_visit_list.js",
-	"Sales By Rep": "public/js/sales_by_rep_list.js"
-}# doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
+	"Customer Visit": "public/js/customer_visit_list.js"
+}
+# doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
 # Svg Icons
@@ -121,7 +120,7 @@ fixtures = [
 # Integration Cleanup
 # -------------------
 # To clean up dependencies/integrations with other apps
-# Name of the app being uninstalled is passed as an argument
+# Name of the app being installed is passed as an argument
 
 # before_app_uninstall = "scm_addon.utils.before_app_uninstall"
 # after_app_uninstall = "scm_addon.utils.after_app_uninstall"
@@ -158,11 +157,13 @@ fixtures = [
 
 doc_events = {
     "Customer Visit": {
-        "on_submit": "scm_addon.scm.doctype.customer_visit.customer_visit.update_sales_by_rep",
-        "on_cancel": "scm_addon.scm.doctype.customer_visit.customer_visit.update_sales_by_rep"
+        "on_update": "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_single_sales_by_rep_from_visit",
+        "on_trash": "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_single_sales_by_rep_from_visit"
     },
     "Sales Order": {
-        "before_validate": "scm_addon.scm.doctype.customer_visit.customer_visit.set_sales_order_defaults"
+        "before_validate": "scm_addon.scm.doctype.customer_visit.customer_visit.set_sales_order_defaults",
+        "on_submit": "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.update_sales_by_rep_from_sales_order",
+        "on_cancel": "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.update_sales_by_rep_from_sales_order"
     }
 }
 
@@ -170,12 +171,9 @@ doc_events = {
 # ---------------
 
 scheduler_events = {
-	"all": [
-		"scm_addon.scm.doctype.customer_visit.customer_visit.refresh_all_sales_by_rep"
-	],
-	"daily": [
-		"scm_addon.scm.doctype.customer_visit.customer_visit.refresh_all_sales_by_rep"
-	],
+    "daily": [
+        "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_all_sales_by_rep"
+    ],
 }
 
 # Testing
@@ -258,4 +256,3 @@ scheduler_events = {
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-
