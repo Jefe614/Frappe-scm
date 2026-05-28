@@ -125,8 +125,8 @@
    "share": 1
   }
  ],
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": [],
- "track_changes": 0
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "states": [],
+  "track_changes": 0
 }

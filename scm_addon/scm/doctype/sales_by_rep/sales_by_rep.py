@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import nowdate, add_days, get_first_day, get_last_day
+from frappe.utils import nowdate, add_days, get_first_day, get_last_day, now
 from datetime import datetime, timedelta
 import calendar
 
@@ -12,95 +12,10 @@ class SalesByRep(Document):
     pass
 
 
-# ─────────────────────────────────────────
-# Date Range Utility Functions
-# ─────────────────────────────────────────
-
-def get_date_range(date_range_type):
-    """
-    Returns a tuple of (start_date, end_date) based on the selected date range.
-    Supports: Today, Yesterday, This Month, Last Month, Last Week, Last Quarter, Last Year, This Year, Yearly
-    """
+def get_today_range():
+    """Returns (start_date, end_date) for today."""
     today = datetime.now().date()
-
-    if date_range_type == "Today":
-        return (today, today)
-
-    elif date_range_type == "Yesterday":
-        yesterday = today - timedelta(days=1)
-        return (yesterday, yesterday)
-
-    elif date_range_type == "This Month":
-        first_day = get_first_day(today)
-        return (first_day, today)
-
-    elif date_range_type == "Last Month":
-        first_day_this_month = get_first_day(today)
-        last_day_prev_month = first_day_this_month - timedelta(days=1)
-        first_day_prev_month = get_first_day(last_day_prev_month)
-        return (first_day_prev_month, last_day_prev_month)
-
-    elif date_range_type == "Last Week":
-        # Last 7 days
-        start = today - timedelta(days=7)
-        return (start, today)
-
-    elif date_range_type == "Last Quarter":
-        # Get the current quarter
-        month = today.month
-        year = today.year
-
-        # Determine current quarter
-        if month <= 3:
-            current_quarter = 1
-        elif month <= 6:
-            current_quarter = 2
-        elif month <= 9:
-            current_quarter = 3
-        else:
-            current_quarter = 4
-
-        # Previous quarter
-        if current_quarter == 1:
-            prev_quarter = 4
-            prev_year = year - 1
-        else:
-            prev_quarter = current_quarter - 1
-            prev_year = year
-
-        # Calculate start and end of previous quarter
-        quarter_months = {
-            1: (1, 3),
-            2: (4, 6),
-            3: (7, 9),
-            4: (10, 12)
-        }
-
-        start_month, end_month = quarter_months[prev_quarter]
-        start_date = datetime(prev_year, start_month, 1).date()
-        last_day_end_month = calendar.monthrange(prev_year, end_month)[1]
-        end_date = datetime(prev_year, end_month, last_day_end_month).date()
-        return (start_date, end_date)
-
-    elif date_range_type == "Last Year":
-        last_year = today.year - 1
-        start_date = datetime(last_year, 1, 1).date()
-        end_date = datetime(last_year, 12, 31).date()
-        return (start_date, end_date)
-
-    elif date_range_type == "This Year":
-        start_date = datetime(today.year, 1, 1).date()
-        return (start_date, today)
-
-    elif date_range_type == "Yearly":
-        # Current year to date
-        start_date = datetime(today.year, 1, 1).date()
-        return (start_date, today)
-
-    else:
-        # Default to This Month
-        first_day = get_first_day(today)
-        return (first_day, today)
+    return (today, today)
 
 
 # ─────────────────────────────────────────
@@ -108,17 +23,13 @@ def get_date_range(date_range_type):
 # ─────────────────────────────────────────
 
 def refresh_single_sales_by_rep_from_visit(doc, method):
-    """Update Sales By Rep when a Customer Visit is saved/cancelled.
-    Updates records for all relevant date ranges."""
+    """Update Sales By Rep when a Customer Visit is saved/cancelled."""
     sales_person = doc.get("sales_person")
     if sales_person:
-        # Update for all date ranges when a visit changes
-        date_ranges = ["Today", "Yesterday", "This Month", "Last Month", "Last Week", "Last Quarter", "Last Year", "This Year"]
-        for date_range in date_ranges:
-            try:
-                refresh_single_sales_by_rep(sales_person, date_range)
-            except Exception as e:
-                frappe.log_error(f"Error updating Sales By Rep for {sales_person} with date range {date_range}: {str(e)}")
+        try:
+            refresh_single_sales_by_rep(sales_person)
+        except Exception as e:
+            frappe.log_error(f"Error updating Sales By Rep for {sales_person}: {str(e)}")
 
 
 # ─────────────────────────────────────────
@@ -126,8 +37,7 @@ def refresh_single_sales_by_rep_from_visit(doc, method):
 # ─────────────────────────────────────────
 
 def update_sales_by_rep_from_sales_order(doc, method):
-    """Update Sales By Rep when a Sales Order is submitted/cancelled.
-    Updates records for all relevant date ranges."""
+    """Update Sales By Rep when a Sales Order is submitted/cancelled."""
     sales_person_names = set()
 
     # 1. Find sales person via Customer Visit -> order_number link
@@ -151,14 +61,11 @@ def update_sales_by_rep_from_sales_order(doc, method):
         if sp:
             sales_person_names.add(sp)
 
-    # Update all date ranges for affected sales persons
-    date_ranges = ["Today", "Yesterday", "This Month", "Last Month", "Last Week", "Last Quarter", "Last Year", "This Year"]
     for sp_name in sales_person_names:
-        for date_range in date_ranges:
-            try:
-                refresh_single_sales_by_rep(sp_name, date_range)
-            except Exception as e:
-                frappe.log_error(f"Error updating Sales By Rep for {sp_name} with date range {date_range}: {str(e)}")
+        try:
+            refresh_single_sales_by_rep(sp_name)
+        except Exception as e:
+            frappe.log_error(f"Error updating Sales By Rep for {sp_name}: {str(e)}")
 
 
 def get_sales_person_for_user(user):
@@ -177,23 +84,24 @@ def get_sales_person_for_user(user):
 # Sales By Rep Aggregation
 # ─────────────────────────────────────────
 
-def refresh_single_sales_by_rep(sales_person_name, date_range="Today"):
-    """Refresh one Sales By Rep record with optional date filtering.
+def refresh_single_sales_by_rep(sales_person_name):
+    """Refresh one Sales By Rep record for today's data.
     Uses raw SQL UPDATE to avoid ORM hook triggers and lock contention.
     """
 
-    # Get date range based on the selected filter
-    start_date, end_date = get_date_range(date_range)
+    # Get date range for today
+    start_date, end_date = get_today_range()
 
     # 1. Count visits and unique customers (with date filter)
+    # NOTE: Field is called "date" in Customer Visit, not "visit_date"
     visits_data = frappe.db.sql("""
         SELECT
             COUNT(DISTINCT cv.name)     AS total_visits,
             COUNT(DISTINCT cv.customer) AS total_customers
         FROM `tabCustomer Visit` cv
         WHERE cv.sales_person = %s
-          AND DATE(cv.visit_date) >= %s
-          AND DATE(cv.visit_date) <= %s
+          AND DATE(cv.date) >= %s
+          AND DATE(cv.date) <= %s
     """, (sales_person_name, start_date, end_date), as_dict=True)
 
     # 2. Sum Sales Orders linked via Customer Visit.order_number (with date filter)
@@ -205,8 +113,8 @@ def refresh_single_sales_by_rep(sales_person_name, date_range="Today"):
         INNER JOIN `tabCustomer Visit` cv
             ON cv.order_number = so.name
         WHERE cv.sales_person = %s
-          AND DATE(cv.visit_date) >= %s
-          AND DATE(cv.visit_date) <= %s
+          AND DATE(cv.date) >= %s
+          AND DATE(cv.date) <= %s
           AND so.docstatus IN (0, 1)
     """, (sales_person_name, start_date, end_date), as_dict=True)
 
@@ -216,13 +124,17 @@ def refresh_single_sales_by_rep(sales_person_name, date_range="Today"):
     # 3. Get targets from Sales Person Target Detail table (always use current fiscal year)
     targets = get_sales_person_targets(sales_person_name)
 
-    # 4. Check if record already exists
+    # 4. Check if record already exists for this sales person
     existing = frappe.db.get_value(
-        "Sales By Rep", {"sales_person": sales_person_name}, "name"
+        "Sales By Rep",
+        {"sales_person": sales_person_name},
+        "name"
     )
 
     if existing:
+        now_ts = now()
         # Raw SQL — bypasses hooks and avoids lock wait timeout
+        # IMPORTANT: manually set modified so the list view detects changes
         frappe.db.sql("""
             UPDATE `tabSales By Rep`
             SET visits             = %s,
@@ -231,7 +143,8 @@ def refresh_single_sales_by_rep(sales_person_name, date_range="Today"):
                 qty_sold           = %s,
                 sales_target       = %s,
                 qty_target         = %s,
-                date_range         = %s
+                modified           = %s,
+                modified_by        = %s
             WHERE name = %s
         """, (
             data_v.get("total_visits", 0),
@@ -240,14 +153,15 @@ def refresh_single_sales_by_rep(sales_person_name, date_range="Today"):
             data_o.get("total_order_qty", 0.0),
             targets.get("sales_target", 0.0),
             targets.get("qty_target", 0.0),
-            date_range,
+            now_ts,
+            frappe.session.user,
             existing
         ))
+        frappe.db.commit()
     else:
         # Insert new record via ORM (only runs once per new sales person)
         doc = frappe.new_doc("Sales By Rep")
         doc.sales_person       = sales_person_name
-        doc.date_range         = date_range
         doc.visits             = data_v.get("total_visits", 0)
         doc.customers_in_route = data_v.get("total_customers", 0)
         doc.sales              = data_o.get("total_order_amount", 0.0)
@@ -255,6 +169,19 @@ def refresh_single_sales_by_rep(sales_person_name, date_range="Today"):
         doc.sales_target       = targets.get("sales_target", 0.0)
         doc.qty_target         = targets.get("qty_target", 0.0)
         doc.insert(ignore_permissions=True)
+
+    # ── Real-time notification to all connected clients ──
+    frappe.publish_realtime(
+        event="sales_by_rep_updated",
+        message={
+            "sales_person": sales_person_name,
+            "visits": data_v.get("total_visits", 0),
+            "customers": data_v.get("total_customers", 0),
+            "sales": data_o.get("total_order_amount", 0.0),
+            "qty_sold": data_o.get("total_order_qty", 0.0),
+        },
+        after_commit=True
+    )
 
 
 def get_sales_person_targets(sales_person_name):
@@ -288,7 +215,7 @@ def get_sales_person_targets(sales_person_name):
     }
 
 
-def refresh_sales_by_rep(date_range="Today"):
+def refresh_all_sales_by_rep():
     """Refresh Sales By Rep for all reps who have Customer Visit data."""
     active_reps = frappe.db.sql("""
         SELECT DISTINCT sales_person
@@ -299,7 +226,7 @@ def refresh_sales_by_rep(date_range="Today"):
 
     for sp in active_reps:
         try:
-            refresh_single_sales_by_rep(sp, date_range)
+            refresh_single_sales_by_rep(sp)
         except Exception:
             frappe.log_error(
                 frappe.get_traceback(),
@@ -307,19 +234,8 @@ def refresh_sales_by_rep(date_range="Today"):
             )
 
 
-def refresh_all_sales_by_rep():
-    """Scheduled job entry point."""
-    # Refresh for all date ranges to ensure data is current
-    date_ranges = ["Today", "Yesterday", "This Month", "Last Month", "Last Week", "Last Quarter", "Last Year", "This Year"]
-    for dr in date_ranges:
-        try:
-            refresh_sales_by_rep(dr)
-        except Exception:
-            frappe.log_error(frappe.get_traceback(), f"Sales By Rep refresh failed for date range: {dr}")
-
-
 def ensure_all_sales_people_initialized():
-    """Ensure all enabled Sales People have Sales By Rep records for all date ranges.
+    """Ensure all enabled Sales People have Sales By Rep records.
     Called during installation to bootstrap the system."""
 
     # Get all enabled Sales People
@@ -330,21 +246,17 @@ def ensure_all_sales_people_initialized():
         pluck="name"
     )
 
-    date_ranges = ["Today", "Yesterday", "This Month", "Last Month", "Last Week", "Last Quarter", "Last Year", "This Year"]
-
     for sales_person in all_sales_people:
-        for date_range in date_ranges:
-            try:
-                # Check if record exists
-                existing = frappe.db.get_value(
-                    "Sales By Rep",
-                    {"sales_person": sales_person, "date_range": date_range},
-                    "name"
-                )
+        try:
+            # Check if record exists
+            existing = frappe.db.get_value(
+                "Sales By Rep",
+                {"sales_person": sales_person},
+                "name"
+            )
 
-                if not existing:
-                    # Create record for this date range
-                    refresh_single_sales_by_rep(sales_person, date_range)
-            except Exception as e:
-                frappe.log_error(f"Error initializing Sales By Rep for {sales_person} ({date_range}): {str(e)}")
-
+            if not existing:
+                # Create record for this sales person
+                refresh_single_sales_by_rep(sales_person)
+        except Exception as e:
+            frappe.log_error(f"Error initializing Sales By Rep for {sales_person}: {str(e)}")

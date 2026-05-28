@@ -4,11 +4,14 @@ from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
 def after_install():
     from scm_addon.scm.doctype.sales_by_rep.sales_by_rep import refresh_all_sales_by_rep, ensure_all_sales_people_initialized
+    from scm_addon.scm.doctype.sales_by_customer.sales_by_customer import refresh_all_sales_by_customer, ensure_all_customers_initialized
     try:
         ensure_all_sales_people_initialized()
         refresh_all_sales_by_rep()
+        ensure_all_customers_initialized()
+        refresh_all_sales_by_customer()
     except Exception as e:
-        frappe.log_error(f"Failed to seed Sales By Rep: {e}", "SCM Install")
+        frappe.log_error(f"Failed to seed reports: {e}", "SCM Install")
 
     setup_custom_fields()
     seed_weekdays()
@@ -17,14 +20,16 @@ def after_install():
 def after_migrate():
     """Re-run setup on migrate to ensure fields/config exist."""
     from scm_addon.scm.doctype.sales_by_rep.sales_by_rep import ensure_all_sales_people_initialized
+    from scm_addon.scm.doctype.sales_by_customer.sales_by_customer import ensure_all_customers_initialized
 
     setup_custom_fields()
     seed_weekdays()
 
     try:
         ensure_all_sales_people_initialized()
+        ensure_all_customers_initialized()
     except Exception as e:
-        frappe.log_error(f"Failed to initialize Sales By Rep: {e}", "SCM Migrate")
+        frappe.log_error(f"Failed to initialize reports: {e}", "SCM Migrate")
 
 
 def setup_custom_fields():

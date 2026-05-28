@@ -47,11 +47,14 @@ app_include_js = [
 # include js in doctype views
 doctype_js = {
 	"Customer Visit": "public/js/customer_visit.js",
-	"Sales By Rep": "public/js/sales_by_rep.js"
+	"Sales By Rep": "public/js/sales_by_rep.js",
+	"Sales By Customer": "public/js/sales_by_customer.js"
 }
 
 doctype_list_js = {
-	"Customer Visit": "public/js/customer_visit_list.js"
+	"Customer Visit": "public/js/customer_visit_list.js",
+	"Sales By Customer": "public/js/sales_by_customer_list.js",
+	"Sales By Rep": "public/js/sales_by_rep_list.js"
 }
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -96,6 +99,13 @@ after_migrate = "scm_addon.install.after_migrate"
 fixtures = [
     {"dt": "Dashboard Chart", "filters": [["module", "=", "SCM"]]},
     {"dt": "Workspace", "filters": [["module", "=", "SCM"]]},
+    {"dt": "Number Card", "filters": [["name", "in", [
+        "Total Orders Today",
+        "Total Sales Reps",
+        "Total Visits Today",
+        "Total Deliveries Today",
+        "Delivery Trips Completed"
+    ]]]},
     {"dt": "Module Onboarding", "filters": [["module", "=", "SCM"]]},
     {"dt": "Onboarding Step", "filters": [["name", "in", [
         "Create Route Plan", "Create Activity Type",
@@ -157,13 +167,25 @@ fixtures = [
 
 doc_events = {
     "Customer Visit": {
-        "on_update": "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_single_sales_by_rep_from_visit",
-        "on_trash": "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_single_sales_by_rep_from_visit"
+        "on_update": [
+            "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_single_sales_by_rep_from_visit",
+            "scm_addon.scm.doctype.sales_by_customer.sales_by_customer.refresh_sales_by_customer_from_visit"
+        ],
+        "on_trash": [
+            "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_single_sales_by_rep_from_visit",
+            "scm_addon.scm.doctype.sales_by_customer.sales_by_customer.refresh_sales_by_customer_from_visit"
+        ]
     },
     "Sales Order": {
         "before_validate": "scm_addon.scm.doctype.customer_visit.customer_visit.set_sales_order_defaults",
-        "on_submit": "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.update_sales_by_rep_from_sales_order",
-        "on_cancel": "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.update_sales_by_rep_from_sales_order"
+        "on_submit": [
+            "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.update_sales_by_rep_from_sales_order",
+            "scm_addon.scm.doctype.sales_by_customer.sales_by_customer.update_sales_by_customer_from_sales_order"
+        ],
+        "on_cancel": [
+            "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.update_sales_by_rep_from_sales_order",
+            "scm_addon.scm.doctype.sales_by_customer.sales_by_customer.update_sales_by_customer_from_sales_order"
+        ]
     }
 }
 
@@ -172,7 +194,8 @@ doc_events = {
 
 scheduler_events = {
     "daily": [
-        "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_all_sales_by_rep"
+        "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_all_sales_by_rep",
+        "scm_addon.scm.doctype.sales_by_customer.sales_by_customer.refresh_all_sales_by_customer"
     ],
 }
 

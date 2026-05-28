@@ -33,10 +33,21 @@ frappe.listview_settings['Sales By Rep'] = {
     },
 
     onload: function(listview) {
-        // Force all columns to show
+        // Hide the ID/name column in both header and rows
+        setTimeout(function() {
+            $(
+                '.list-row-head .list-row-col:first-child, ' +
+                '.list-row-container .list-row-col:first-child, ' +
+                '.list-row-head .list-row-col:contains("ID"), ' +
+                '.list-subject .ellipsis, ' +
+                '.list-row-check'
+            ).hide();
+        }, 300);
+
+        // Refresh button
         listview.page.add_inner_button(__('Refresh All'), function() {
             frappe.call({
-                method: 'scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_sales_by_rep',
+                method: 'scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_all_sales_by_rep',
                 freeze: true,
                 freeze_message: __('Refreshing Sales By Rep data...'),
                 callback: function() {

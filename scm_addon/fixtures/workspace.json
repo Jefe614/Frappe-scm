@@ -9,7 +9,7 @@
     "parenttype": "Workspace"
    }
   ],
-  "content": "[{\"id\":\"chart001\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Orders Statistic\",\"col\":12}},{\"id\":\"kb3XPLg8lb\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"nWd2KJPW8l\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Route Plans\",\"col\":4}},{\"id\":\"snrzfbFr5Y\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Activity Types\",\"col\":4}},{\"id\":\"NEL1234567\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Todo Activity Feedback\",\"col\":4}},{\"id\":\"NELTERRITORY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Territory\",\"col\":4}},{\"id\":\"NELSALESORDER\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Order\",\"col\":4}},{\"id\":\"VISITSHORTCUT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Visit\",\"col\":4}},{\"id\":\"d_KVM1gsf9\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"RPTSPACER01\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"RPTHEADER01\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports</b></span>\",\"col\":12}},{\"id\":\"RPTCD01\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":12}}]",
+  "content": "[{\"id\":\"chart001\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Orders Statistic\",\"col\":12}},{\"id\":\"NC001\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Orders Today\",\"col\":3}},{\"id\":\"NC002\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Sales Reps\",\"col\":3}},{\"id\":\"NC003\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Visits Today\",\"col\":3}},{\"id\":\"NC004\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Deliveries Today\",\"col\":3}},{\"id\":\"NC005\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Delivery Trips Completed\",\"col\":3}},{\"id\":\"kb3XPLg8lb\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"nWd2KJPW8l\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Route Plans\",\"col\":4}},{\"id\":\"snrzfbFr5Y\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Activity Types\",\"col\":4}},{\"id\":\"NEL1234567\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Todo Activity Feedback\",\"col\":4}},{\"id\":\"NELTERRITORY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Territory\",\"col\":4}},{\"id\":\"NELSALESORDER\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Order\",\"col\":4}},{\"id\":\"VISITSHORTCUT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Visit\",\"col\":4}},{\"id\":\"d_KVM1gsf9\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"RPTSPACER01\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"RPTHEADER01\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Reports</b></span>\",\"col\":12}},{\"id\":\"RPTCD01\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":12}}]",
   "custom_blocks": [],
   "docstatus": 0,
   "doctype": "Workspace",
@@ -146,29 +146,73 @@
     "report_ref_doctype": null,
     "type": "Card Break"
    },
-   {
-    "dependencies": "",
-    "description": null,
-    "hidden": 0,
-    "icon": "chart",
-    "is_query_report": 0,
-    "label": "Sales By Rep",
-    "link_count": 0,
-    "link_to": "Sales By Rep",
-    "link_type": "DocType",
-    "onboard": 0,
-    "only_for": "",
-    "parent": "SCM VAP",
-    "parentfield": "links",
-    "parenttype": "Workspace",
-    "report_ref_doctype": null,
-    "type": "Link"
-   }
-  ],
+    {
+     "dependencies": "",
+     "description": null,
+     "hidden": 0,
+     "icon": "chart",
+     "is_query_report": 0,
+     "label": "Sales By Rep",
+     "link_count": 0,
+     "link_to": "Sales By Rep",
+     "link_type": "DocType",
+     "onboard": 0,
+     "only_for": "",
+     "parent": "SCM VAP",
+     "parentfield": "links",
+     "parenttype": "Workspace",
+     "report_ref_doctype": null,
+     "type": "Link"
+    },
+    {
+     "dependencies": "",
+     "description": null,
+     "hidden": 0,
+     "icon": "chart",
+     "is_query_report": 0,
+     "label": "Sales By Customer",
+     "link_count": 0,
+     "link_to": "Sales By Customer",
+     "link_type": "DocType",
+     "onboard": 0,
+     "only_for": "",
+     "parent": "SCM VAP",
+     "parentfield": "links",
+     "parenttype": "Workspace",
+     "report_ref_doctype": null,
+     "type": "Link"
+    }
+   ],
   "modified": "2026-05-17 17:50:47.784719",
   "module": "SCM",
   "name": "SCM VAP",
-  "number_cards": [],
+  "number_cards": [
+    {
+      "number_card_name": "Total Orders Today",
+      "label": "Total Orders Today",
+      "col": 3
+    },
+    {
+      "number_card_name": "Total Sales Reps",
+      "label": "Total Sales Reps",
+      "col": 3
+    },
+    {
+      "number_card_name": "Total Visits Today",
+      "label": "Total Visits Today",
+      "col": 3
+    },
+    {
+      "number_card_name": "Total Deliveries Today",
+      "label": "Total Deliveries Today",
+      "col": 3
+    },
+    {
+      "number_card_name": "Delivery Trips Completed",
+      "label": "Delivery Trips Completed",
+      "col": 3
+    }
+  ],
   "parent_page": "",
   "public": 1,
   "quick_lists": [],

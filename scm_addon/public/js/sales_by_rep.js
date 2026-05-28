@@ -1,75 +1,29 @@
-frappe.listview_settings['Sales By Rep'] = {
-	add_fields: ["date_range", "sales_person", "sales", "qty_sold", "visits", "customers_in_route"],
-	onload: function(listview) {
-		// Add custom filtering for date range
-		listview.page.add_inner_button(__('Refresh Data'), function() {
-			frappe.call({
-				method: 'scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_all_sales_by_rep',
-				callback: function(r) {
-					frappe.msgprint(__('Sales By Rep data refreshed successfully'));
-					listview.refresh();
-				}
-			});
-		});
-	}
-};
+// Sales By Realtime Auto-Refresh
+// Listens for real-time events pushed from the backend when Customer Visits
+// are created/updated, and auto-refreshes the list view so data is always current.
 
-// Custom report view for Sales By Rep
-if (frappe.views.ReportView) {
-	frappe.views.ReportView = frappe.views.ReportView.extend({
-		setup: function() {
-			this._super();
+frappe.realtime.on("sales_by_rep_updated", function(data) {
+    console.log("📊 Sales By Rep updated:", data.sales_person, data.date_range);
 
-			// Add date range filter to report
-			if (this.doctype === 'Sales By Rep') {
-				this.add_date_range_filter();
-			}
-		},
+    // If we are on the Sales By Rep list view, refresh it
+    if (
+        frappe.get_route &&
+        frappe.get_route()[0] === "List" &&
+        frappe.get_route()[1] === "Sales By Rep"
+    ) {
+        // Throttle refreshes - only refresh if no recent refresh happened
+        let now = Date.now();
+        if (!frappe._last_sbr_refresh || (now - frappe._last_sbr_refresh) > 3000) {
+            frappe._last_sbr_refresh = now;
 
-		add_date_range_filter: function() {
-			const self = this;
-
-			// This will be called when the report is loaded
-			setTimeout(function() {
-				if (cur_list && cur_list.doctype === 'Sales By Rep') {
-					// Add filter dropdown for date ranges
-					const date_ranges = [
-						{ label: 'Today', value: 'Today' },
-						{ label: 'Yesterday', value: 'Yesterday' },
-						{ label: 'This Month', value: 'This Month' },
-						{ label: 'Last Month', value: 'Last Month' },
-						{ label: 'Last Week', value: 'Last Week' },
-						{ label: 'Last Quarter', value: 'Last Quarter' },
-						{ label: 'Last Year', value: 'Last Year' },
-						{ label: 'This Year', value: 'This Year' },
-						{ label: 'Yearly', value: 'Yearly' }
-					];
-				}
-			}, 500);
-		}
-	});
-}
-
-// Customize the report columns and filtering
-frappe.ui.form.on('Sales By Rep', {
-	refresh: function(frm) {
-		// Add real-time update button
-		if (!frm.is_new()) {
-			frm.add_custom_button(__('Refresh Report'), function() {
-				frappe.call({
-					method: 'frappe.client.get',
-					args: {
-						doctype: 'Sales By Rep',
-						name: frm.doc.name
-					},
-					callback: function(r) {
-						if (r.message) {
-							frm.reload_doc();
-							frappe.msgprint(__('Report refreshed'));
-						}
-					}
-				});
-			});
-		}
-	}
+            // Trigger list view refresh
+            let listview = frappe.get_listview && frappe.get_listview("Sales By Rep");
+            if (listview) {
+                listview.refresh();
+            } else {
+                // Fallback: reload the current route
+                frappe.ui.toolbar.clear_cache_and_reload();
+            }
+        }
+    }
 });

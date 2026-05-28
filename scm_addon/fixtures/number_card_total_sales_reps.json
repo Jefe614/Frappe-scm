@@ -1,0 +1,23 @@
+[
+ {
+  "creation": "2026-05-28 14:00:00.000000",
+  "docstatus": 0,
+  "doctype": "Number Card",
+  "document_type": "Sales Person",
+  "filters_json": "[[\"Sales Person\",\"is_group\",\"=\",0]]",
+  "function": "Count",
+  "idx": 0,
+  "is_public": 1,
+  "is_standard": 1,
+  "label": "Total Sales Reps",
+  "modified": "2026-05-28 14:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "SCM",
+  "name": "Total Sales Reps",
+  "owner": "Administrator",
+  "show_percentage_stats": 1,
+  "stats_time_interval": "Daily",
+  "type": "Document Type",
+  "color": "#ECAD4B"
+ }
+]
