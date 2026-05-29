@@ -1,0 +1,17 @@
+{
+  "chart_name": "Daily Sales Rep Performance",
+  "chart_type": "Custom",
+  "document_type": "Sales By Rep",
+  "source": "SCM Daily Sales Rep",
+  "based_on": "",
+  "timeseries": 0,
+  "time_interval": "Daily",
+  "type": "Bar",
+  "is_public": 1,
+  "is_standard": 1,
+  "filters_json": "[]",
+  "doctype": "Dashboard Chart",
+  "name": "Daily Sales Rep Performance",
+  "module": "SCM",
+  "color": "#4463F0"
+}

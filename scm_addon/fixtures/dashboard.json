@@ -1,0 +1,74 @@
+[
+ {
+  "dashboard_name": "SCM Operations Dashboard",
+  "is_default": 0,
+  "is_standard": 0,
+  "charts": [
+   {
+    "chart": "Daily Sales Rep Performance",
+    "width": "Full",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "charts",
+    "parenttype": "Dashboard"
+   },
+   {
+    "chart": "Sales Rep Performance",
+    "width": "Half",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "charts",
+    "parenttype": "Dashboard"
+   },
+   {
+    "chart": "Sales By Customer Distribution",
+    "width": "Half",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "charts",
+    "parenttype": "Dashboard"
+   },
+   {
+    "chart": "Customer Visit Trends",
+    "width": "Half",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "charts",
+    "parenttype": "Dashboard"
+   },
+   {
+    "chart": "Delivery Performance",
+    "width": "Half",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "charts",
+    "parenttype": "Dashboard"
+   }
+  ],
+  "cards": [
+   {
+    "card": "Total Orders Today",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "cards",
+    "parenttype": "Dashboard"
+   },
+   {
+    "card": "Total Customers Visited",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "cards",
+    "parenttype": "Dashboard"
+   },
+   {
+    "card": "Total Visits Today",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "cards",
+    "parenttype": "Dashboard"
+   },
+   {
+    "card": "Total Deliveries Today",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "cards",
+    "parenttype": "Dashboard"
+   }
+  ],
+  "chart_options": "{\"colors\": [\"#4463F0\", \"#29CD42\", \"#FF6B6B\", \"#FFA500\", \"#9B59B6\", \"#1ABC9C\"]}",
+  "docstatus": 0,
+  "doctype": "Dashboard",
+  "name": "SCM Operations Dashboard"
+ }
+]

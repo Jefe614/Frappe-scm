@@ -1,0 +1,19 @@
+{
+  "chart_name": "Delivery Performance",
+  "chart_type": "Group By",
+  "document_type": "Driver Report",
+  "group_by_type": "Sum",
+  "based_on": "",
+  "group_by_based_on": "driver",
+  "aggregate_function_based_on": "completed_deliveries",
+  "number_of_groups": 10,
+  "timeseries": 0,
+  "time_interval": "Daily",
+  "type": "Bar",
+  "is_public": 1,
+  "is_standard": 1,
+  "filters_json": "[]",
+  "doctype": "Dashboard Chart",
+  "name": "Delivery Performance",
+  "module": "SCM"
+}

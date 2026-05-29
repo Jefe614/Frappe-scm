@@ -54,7 +54,8 @@ doctype_js = {
 doctype_list_js = {
 	"Customer Visit": "public/js/customer_visit_list.js",
 	"Sales By Customer": "public/js/sales_by_customer_list.js",
-	"Sales By Rep": "public/js/sales_by_rep_list.js"
+	"Sales By Rep": "public/js/sales_by_rep_list.js",
+	"Driver Report": "public/js/driver_report_list.js"
 }
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -96,15 +97,26 @@ doctype_list_js = {
 # before_install = "scm_addon.install.before_install"
 after_install = "scm_addon.install.after_install"
 after_migrate = "scm_addon.install.after_migrate"
+
+# Patch Number Card percentage calculation so dashboard percentages render
+# even when previous period value is 0.
+override_whitelisted_methods = {
+	"frappe.desk.doctype.number_card.number_card.get_percentage_difference": "scm_addon.number_card_patch.get_percentage_difference_with_zero_previous"
+}
+
 fixtures = [
+
     {"dt": "Dashboard Chart", "filters": [["module", "=", "SCM"]]},
+    {"dt": "Dashboard Chart Source", "filters": [["source_name", "like", "scm_addon%"]]},
+    {"dt": "Dashboard", "filters": [["module", "=", "SCM"]]},
     {"dt": "Workspace", "filters": [["module", "=", "SCM"]]},
     {"dt": "Number Card", "filters": [["name", "in", [
         "Total Orders Today",
         "Total Sales Reps",
         "Total Visits Today",
         "Total Deliveries Today",
-        "Delivery Trips Completed"
+        "Delivery Trips Completed",
+        "Total Customers Visited"
     ]]]},
     {"dt": "Module Onboarding", "filters": [["module", "=", "SCM"]]},
     {"dt": "Onboarding Step", "filters": [["name", "in", [
@@ -186,6 +198,11 @@ doc_events = {
             "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.update_sales_by_rep_from_sales_order",
             "scm_addon.scm.doctype.sales_by_customer.sales_by_customer.update_sales_by_customer_from_sales_order"
         ]
+    },
+    "Delivery Trip": {
+        "on_update": "scm_addon.scm.doctype.driver_report.driver_report.update_driver_report_on_trip_change",
+        "on_submit": "scm_addon.scm.doctype.driver_report.driver_report.update_driver_report_on_trip_change",
+        "on_trash": "scm_addon.scm.doctype.driver_report.driver_report.update_driver_report_on_trip_change"
     }
 }
 
@@ -195,7 +212,8 @@ doc_events = {
 scheduler_events = {
     "daily": [
         "scm_addon.scm.doctype.sales_by_rep.sales_by_rep.refresh_all_sales_by_rep",
-        "scm_addon.scm.doctype.sales_by_customer.sales_by_customer.refresh_all_sales_by_customer"
+        "scm_addon.scm.doctype.sales_by_customer.sales_by_customer.refresh_all_sales_by_customer",
+        "scm_addon.scm.doctype.driver_report.driver_report.refresh_all_driver_reports"
     ],
 }
 

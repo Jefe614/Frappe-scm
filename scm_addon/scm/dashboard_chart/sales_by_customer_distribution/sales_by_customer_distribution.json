@@ -1,0 +1,18 @@
+{
+  "chart_name": "Sales By Customer Distribution",
+  "chart_type": "Group By",
+  "document_type": "Sales By Customer",
+  "group_by_type": "Sum",
+  "based_on": "",
+  "group_by_based_on": "customer",
+  "aggregate_function_based_on": "total_sales",
+  "number_of_groups": 10,
+  "timeseries": 0,
+  "time_interval": "Daily",
+  "type": "Pie",
+  "is_public": 1,
+  "is_standard": 1,
+  "filters_json": "[]",
+  "doctype": "Dashboard Chart",
+  "name": "Sales By Customer Distribution"
+}
