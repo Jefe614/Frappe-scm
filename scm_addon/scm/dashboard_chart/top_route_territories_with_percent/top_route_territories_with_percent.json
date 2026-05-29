@@ -1,0 +1,18 @@
+{
+  "chart_name": "Top 10 Route Territories",
+  "chart_type": "Custom",
+  "document_type": "Route Plan",
+  "source": "SCM Top Route Territories",
+  "based_on": "",
+  "timeseries": 0,
+  "time_interval": "Daily",
+  "type": "Bar",
+  "is_public": 1,
+  "is_standard": 0,
+  "filters_json": "[]",
+  "doctype": "Dashboard Chart",
+  "name": "Top 10 Route Territories",
+  "module": "SCM",
+  "color": "#FFA500"
+}
+

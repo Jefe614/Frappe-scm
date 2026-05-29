@@ -201,38 +201,34 @@
     "type": "Link"
    }
   ],
-  "modified": "2026-05-29 11:25:00.000000",
+  "modified": "2026-05-29 11:25:00",
   "module": "SCM",
   "name": "SCM Operations",
   "number_cards": [
    {
-    "number_card_name": "Total Orders Today",
     "label": "Total Orders Today",
-    "col": 3,
+    "number_card_name": "Total Orders Today",
     "parent": "SCM Operations",
     "parentfield": "number_cards",
     "parenttype": "Workspace"
    },
    {
-    "number_card_name": "Total Visits Today",
     "label": "Total Visits Today",
-    "col": 3,
+    "number_card_name": "Total Visits Today",
     "parent": "SCM Operations",
     "parentfield": "number_cards",
     "parenttype": "Workspace"
    },
    {
-    "number_card_name": "Total Deliveries Today",
     "label": "Total Deliveries Today",
-    "col": 3,
+    "number_card_name": "Total Deliveries Today",
     "parent": "SCM Operations",
     "parentfield": "number_cards",
     "parenttype": "Workspace"
    },
    {
-    "number_card_name": "Delivery Trips Completed",
     "label": "Delivery Trips Completed",
-    "col": 3,
+    "number_card_name": "Delivery Trips Completed",
     "parent": "SCM Operations",
     "parentfield": "number_cards",
     "parenttype": "Workspace"

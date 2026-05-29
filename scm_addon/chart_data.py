@@ -9,6 +9,7 @@ from datetime import date, timedelta
 def _resolve_date_range(time_range=None, from_date=None, to_date=None):
     """
     Resolve from_date / to_date from either a preset time_range label
+
     or explicit from_date + to_date values.
     """
     today_date = today()
@@ -67,6 +68,7 @@ def get_daily_sales_rep_performance(
     from_date=None,
     to_date=None
 ):
+
     from_date, to_date = _resolve_date_range(time_range, from_date, to_date)
 
     # Get all distinct sales persons
@@ -141,3 +143,133 @@ def get_daily_sales_rep_performance(
             {"name": _("Orders"),            "values": orders_count,     "chartType": "bar"},
         ]
     }
+
+
+def _safe_percent(value, total):
+    try:
+        if not total:
+            return 0
+        return (float(value) / float(total)) * 100.0
+    except Exception:
+        return 0
+
+
+@frappe.whitelist(allow_guest=True)
+def get_top_products_with_percent(chart_name=None, time_range=None, from_date=None, to_date=None):
+    from_date, to_date = _resolve_date_range(time_range, from_date, to_date)
+
+    rows = frappe.db.sql(
+        """
+        SELECT
+            item.item_code AS item_code,
+            item.item_name AS item_name,
+            SUM(soi.qty) AS total_qty,
+            SUM(soi.base_net_amount) AS net_amount
+        FROM `tabSales Order` so
+        INNER JOIN `tabSales Order Item` soi ON soi.parent = so.name
+        INNER JOIN `tabItem` item ON item.name = soi.item_code
+        WHERE so.docstatus = 1
+          AND so.transaction_date BETWEEN %(from_date)s AND %(to_date)s
+        GROUP BY item.item_code, item.item_name
+        ORDER BY net_amount DESC
+        LIMIT 10
+        """,
+        {"from_date": from_date, "to_date": to_date},
+        as_dict=True,
+    )
+
+    total_net = frappe.db.sql(
+        """
+        SELECT SUM(soi.base_net_amount) AS total
+        FROM `tabSales Order` so
+        INNER JOIN `tabSales Order Item` soi ON soi.parent = so.name
+        WHERE so.docstatus = 1
+          AND so.transaction_date BETWEEN %(from_date)s AND %(to_date)s
+        """,
+        {"from_date": from_date, "to_date": to_date},
+        as_dict=True,
+    )
+    total_net = (total_net[0].total if total_net and total_net[0].get("total") is not None else 0)
+
+    labels     = []
+    values     = []
+    percents   = []
+    quantities = []
+
+    for r in rows:
+        label = r.item_name if r.item_name and r.item_name.strip() else r.item_code
+        labels.append(label)
+        values.append(float(r.net_amount or 0))
+        percents.append(_safe_percent(r.net_amount or 0, total_net))
+        quantities.append(int(r.total_qty or 0))
+
+    return {
+        "labels": labels,
+        "quantities": quantities,          # ← new field for the custom renderer
+        "datasets": [
+            {"name": _("Net Amount"), "values": values,   "chartType": "bar"},
+            {"name": _("Percent"),    "values": percents,  "chartType": "line"},
+        ],
+    }
+
+
+@frappe.whitelist(allow_guest=True)
+def get_top_route_territories_with_percent(chart_name=None, time_range=None, from_date=None, to_date=None):
+    from_date, to_date = _resolve_date_range(time_range, from_date, to_date)
+
+    # Top territories by total Sales Order net amount.
+    # Territory is taken from customer's territory (assumed on Customer).
+    rows = frappe.db.sql(
+        """
+        SELECT
+            c.territory AS territory,
+            SUM(soi.base_net_amount) AS net_amount
+        FROM `tabSales Order` so
+        INNER JOIN `tabSales Order Item` soi ON soi.parent = so.name
+        INNER JOIN `tabCustomer` c ON c.name = so.customer
+        WHERE so.docstatus = 1
+          AND so.transaction_date BETWEEN %(from_date)s AND %(to_date)s
+          AND c.territory IS NOT NULL
+          AND c.territory != ''
+        GROUP BY c.territory
+        ORDER BY net_amount DESC
+        LIMIT 10
+        """,
+        {"from_date": from_date, "to_date": to_date},
+        as_dict=True,
+    )
+
+    total_rows = frappe.db.sql(
+        """
+        SELECT SUM(soi.base_net_amount) AS total
+        FROM `tabSales Order` so
+        INNER JOIN `tabSales Order Item` soi ON soi.parent = so.name
+        INNER JOIN `tabCustomer` c ON c.name = so.customer
+        WHERE so.docstatus = 1
+          AND so.transaction_date BETWEEN %(from_date)s AND %(to_date)s
+          AND c.territory IS NOT NULL
+          AND c.territory != ''
+        """,
+        {"from_date": from_date, "to_date": to_date},
+        as_dict=True,
+    )
+    total_net = (total_rows[0].total if total_rows and total_rows[0].get("total") is not None else 0)
+
+    labels = []
+    values = []
+    percents = []
+
+    for r in rows:
+        labels.append(r.territory)
+        values.append(float(r.net_amount or 0))
+        percents.append(_safe_percent(r.net_amount or 0, total_net))
+
+    return {
+        "labels": labels,
+        "datasets": [
+            {"name": _("Net Amount"), "values": values, "chartType": "bar"},
+            {"name": _("Percent"), "values": percents, "chartType": "line"},
+        ],
+    }
+
+

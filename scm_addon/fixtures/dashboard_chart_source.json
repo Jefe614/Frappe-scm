@@ -1,13 +1,1 @@
-[
- {
-  "name": "SCM Daily Sales Rep",
-  "source_name": "SCM Daily Sales Rep",
-  "module": "SCM",
-  "is_standard": 1,
-  "is_public": 1,
-  "docstatus": 0,
-  "doctype": "Dashboard Chart Source",
-  "modified": "2026-05-29 10:40:00.000000",
-  "owner": "Administrator"
- }
-]
+[]

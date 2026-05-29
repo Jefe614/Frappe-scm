@@ -38,6 +38,20 @@
     "parent": "SCM Operations Dashboard",
     "parentfield": "charts",
     "parenttype": "Dashboard"
+   },
+   {
+    "chart": "Top 10 Selling Products",
+    "width": "Half",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "charts",
+    "parenttype": "Dashboard"
+   },
+   {
+    "chart": "Top 10 Route Territories",
+    "width": "Half",
+    "parent": "SCM Operations Dashboard",
+    "parentfield": "charts",
+    "parenttype": "Dashboard"
    }
   ],
   "cards": [
