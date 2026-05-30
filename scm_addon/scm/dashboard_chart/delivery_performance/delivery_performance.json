@@ -4,7 +4,7 @@
   "document_type": "Driver Report",
   "group_by_type": "Sum",
   "based_on": "",
-  "group_by_based_on": "driver",
+  "group_by_based_on": "driver_name",
   "aggregate_function_based_on": "completed_deliveries",
   "number_of_groups": 10,
   "timeseries": 0,

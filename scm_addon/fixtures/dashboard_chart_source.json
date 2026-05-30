@@ -1,1 +1,29 @@
-[]
+[
+ {
+  "docstatus": 0,
+  "doctype": "Dashboard Chart Source",
+  "modified": "2026-05-29 10:40:00",
+  "module": "SCM",
+  "name": "SCM Daily Sales Rep",
+  "source_name": "SCM Daily Sales Rep",
+  "timeseries": 0
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Dashboard Chart Source",
+  "modified": "2026-05-29 10:40:00",
+  "module": "SCM",
+  "name": "SCM Top Products",
+  "source_name": "SCM Top Products",
+  "timeseries": 0
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Dashboard Chart Source",
+  "modified": "2026-05-29 10:40:00",
+  "module": "SCM",
+  "name": "SCM Top Route Territories",
+  "source_name": "SCM Top Route Territories",
+  "timeseries": 0
+ }
+]

@@ -1,5 +1,6 @@
 # Copyright (c) 2026, VAPTECH
 import frappe
+import json
 from frappe.utils import today, add_days, get_first_day, get_last_day, \
     add_months, get_year_start, get_year_ending, getdate
 from frappe import _
@@ -58,7 +59,29 @@ def _resolve_date_range(time_range=None, from_date=None, to_date=None):
             return str(date(last_year, 1, 1)), str(date(last_year, 12, 31))
 
     # Fallback: explicit dates or default to today
-    return (from_date or today_date), (to_date or today_date)
+    if not from_date or (isinstance(from_date, str) and from_date.strip() == ""):
+        from_date = today_date
+    if not to_date or (isinstance(to_date, str) and to_date.strip() == ""):
+        to_date = today_date
+    return from_date, to_date
+
+
+def _extract_filters(chart_name=None, time_range=None, from_date=None, to_date=None, filters=None):
+    """
+    Frappe passes filters as individual kwargs in get() but as a JSON 'filters'
+    parameter in method(). This utility normalizes both.
+    """
+    # Parse filters from JSON string (method-based calls)
+    if isinstance(filters, str):
+        try:
+            filters = json.loads(filters)
+        except Exception:
+            filters = None
+    if isinstance(filters, dict):
+        time_range = time_range or filters.get("time_range")
+        from_date = from_date or filters.get("from_date")
+        to_date = to_date or filters.get("to_date")
+    return time_range, from_date, to_date
 
 
 @frappe.whitelist(allow_guest=True)
@@ -66,9 +89,10 @@ def get_daily_sales_rep_performance(
     chart_name=None,
     time_range=None,
     from_date=None,
-    to_date=None
+    to_date=None,
+    filters=None
 ):
-
+    time_range, from_date, to_date = _extract_filters(chart_name, time_range, from_date, to_date, filters)
     from_date, to_date = _resolve_date_range(time_range, from_date, to_date)
 
     # Get all distinct sales persons
@@ -155,7 +179,8 @@ def _safe_percent(value, total):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_top_products_with_percent(chart_name=None, time_range=None, from_date=None, to_date=None):
+def get_top_products_with_percent(chart_name=None, time_range=None, from_date=None, to_date=None, filters=None):
+    time_range, from_date, to_date = _extract_filters(chart_name, time_range, from_date, to_date, filters)
     from_date, to_date = _resolve_date_range(time_range, from_date, to_date)
 
     rows = frappe.db.sql(
@@ -205,16 +230,16 @@ def get_top_products_with_percent(chart_name=None, time_range=None, from_date=No
 
     return {
         "labels": labels,
-        "quantities": quantities,          # ← new field for the custom renderer
+        "quantities": quantities,
         "datasets": [
-            {"name": _("Net Amount"), "values": values,   "chartType": "bar"},
-            {"name": _("Percent"),    "values": percents,  "chartType": "line"},
+            {"name": _("Net Amount"), "values": values, "chartType": "bar"},
         ],
     }
 
 
 @frappe.whitelist(allow_guest=True)
-def get_top_route_territories_with_percent(chart_name=None, time_range=None, from_date=None, to_date=None):
+def get_top_route_territories_with_percent(chart_name=None, time_range=None, from_date=None, to_date=None, filters=None):
+    time_range, from_date, to_date = _extract_filters(chart_name, time_range, from_date, to_date, filters)
     from_date, to_date = _resolve_date_range(time_range, from_date, to_date)
 
     # Top territories by total Sales Order net amount.
@@ -266,10 +291,8 @@ def get_top_route_territories_with_percent(chart_name=None, time_range=None, fro
 
     return {
         "labels": labels,
+        "quantities": values,
         "datasets": [
             {"name": _("Net Amount"), "values": values, "chartType": "bar"},
-            {"name": _("Percent"), "values": percents, "chartType": "line"},
         ],
     }
-
-

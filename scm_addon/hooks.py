@@ -107,7 +107,11 @@ override_whitelisted_methods = {
 fixtures = [
 
     {"dt": "Dashboard Chart", "filters": [["module", "=", "SCM"]]},
-    {"dt": "Dashboard Chart Source", "filters": [["source_name", "like", "scm_addon%"]]},
+    {"dt": "Dashboard Chart Source", "filters": [["name", "in", [
+        "SCM Daily Sales Rep",
+        "SCM Top Route Territories",
+        "SCM Top Products"
+    ]]]},
     {"dt": "Dashboard", "filters": [["module", "=", "SCM"]]},
     {"dt": "Workspace", "filters": [["module", "=", "SCM"]]},
     {"dt": "Number Card", "filters": [["name", "in", [
